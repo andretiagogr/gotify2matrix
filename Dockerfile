@@ -1,7 +1,7 @@
 ###################
 # chef
 ###################
-FROM lukemathwalker/cargo-chef:latest-rust-1.88 AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-1.95 AS chef
 WORKDIR /app
 
 ###################
