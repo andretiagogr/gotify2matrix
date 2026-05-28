@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   gotify2matrix:
     image: ghcr.io/andretiagogr/gotify2matrix:latest
