@@ -59,9 +59,16 @@ The default thresholdsa are 3 for low and 8 for high priorities, meaning that ev
 By setting the respective `plain` or `html` field, the default format can be overriden (i.e. to set font colors or add an icon).
 
 ## Docker
+
+The image is published to GitHub Container Registry and supports `linux/amd64`, `linux/arm64`, and `linux/arm/v7`.
+
+```bash
+docker pull ghcr.io/andretiagogr/gotify2matrix:latest
+```
+
 Modify `.g2m.sample.env`, save it as `.g2m.env` and run `docker compose up -d` to run the server.
 
 ## Verification
 After the first run, the new session can be verified using another verified instance.
-Start the verification from a another instance and run `cargo run --release -- verify` or `docker compose run gotify2matrix gotify2matrix verify`.
+Start the verification from another instance and run `cargo run --release -- verify` or `docker compose run gotify2matrix gotify2matrix verify`.
 After successful verification, simply quit the program using `CTRL-C`.
