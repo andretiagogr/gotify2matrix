@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use matrix_sdk::{config::SyncSettings, matrix_auth::MatrixSession, Client, Error, LoopCtrl};
-use rand::{distributions::Alphanumeric, thread_rng, Rng};
+use matrix_sdk::{authentication::matrix::MatrixSession, config::SyncSettings, Client, Error, LoopCtrl};
+use rand::{distr::Alphanumeric, Rng, RngExt};
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 use tracing::info;
@@ -126,7 +126,7 @@ async fn build_client(
     config: &config::Config,
     data_dir: &Path,
 ) -> anyhow::Result<(Client, ClientSession)> {
-    let mut rng = thread_rng();
+    let mut rng = rand::rng();
 
     // Generating a subfolder for the database is not mandatory, but it is useful if
     // you allow several clients to run at the same time. Each one must have a
