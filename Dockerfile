@@ -25,7 +25,7 @@ RUN cargo build --release
 ###################
 # runtime
 ###################
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 WORKDIR /app
 RUN apt-get update && apt-get install -y \
     libsqlite3-0 \
