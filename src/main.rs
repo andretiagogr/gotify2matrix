@@ -1,22 +1,23 @@
 use std::path::PathBuf;
-use structopt::StructOpt;
+use clap::Parser;
 
 mod client;
 pub mod config;
 pub mod session;
 mod verify;
 
-#[derive(StructOpt, Clone)]
+#[derive(clap::Subcommand)]
 enum Command {
-    #[structopt(about = "Wait for incoming device verifications")]
+    /// Wait for incoming device verifications
     Verify,
 }
 
-#[derive(StructOpt)]
+#[derive(Parser)]
+#[command(version)]
 struct Options {
-    #[structopt(short = "c", long = "config")]
+    #[arg(short = 'c', long = "config")]
     config_file: Option<PathBuf>,
-    #[structopt(subcommand)]
+    #[command(subcommand)]
     command: Option<Command>,
 }
 
@@ -24,7 +25,7 @@ struct Options {
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
 
-    let options = Options::from_args();
+    let options = Options::parse();
 
     let config_file = match options.config_file {
         Some(file) => file,

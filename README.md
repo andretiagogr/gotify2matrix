@@ -5,21 +5,16 @@ A small helper to relay messages from a gotify server to an end2end-encrypted ma
 
 ## Usage
 ```
-gotify2matrix
+Usage: gotify2matrix [OPTIONS] [COMMAND]
 
-USAGE:
-    gotify2matrix [OPTIONS] [SUBCOMMAND]
+Commands:
+  verify  Wait for incoming device verifications
+  help    Print this message or the help of the given subcommand(s)
 
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-OPTIONS:
-    -c, --config <config-file>
-
-SUBCOMMANDS:
-    help      Prints this message or the help of the given subcommand(s)
-    verify    Wait for incoming device verifications
+Options:
+  -c, --config <CONFIG_FILE>
+  -h, --help                  Print help
+  -V, --version               Print version
 ```
 
 ```bash

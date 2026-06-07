@@ -14,7 +14,7 @@ tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
 rand = "0.10.1"
 dirs = "6.0.0"
-structopt = "0.3.26"
+clap = { version = "4.6.1", features = ["derive"] }
 toml = "1.1.2"
 futures-util = "0.3.32"
 gotify = { version = "0.4.0", features = ["client-core", "manage-messages", "manage-applications", "websocket"] }
