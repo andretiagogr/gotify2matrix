@@ -1,7 +1,7 @@
 use crate::{config, session};
 use anyhow::{Error, Result};
 use futures_util::StreamExt;
-use gotify::ClientClient as GotifyClient;
+use crate::gotify_client::{Application, GotifyClient, Message as GotifyMessage};
 use handlebars::Handlebars;
 use matrix_sdk::{
     config::SyncSettings,
@@ -47,7 +47,7 @@ macro_rules! register {
 }
 
 struct Converter<'a> {
-    apps: Vec<gotify::models::Application>,
+    apps: Vec<Application>,
     handlebars: Handlebars<'a>,
     low: i32,
     high: i32,
@@ -87,7 +87,7 @@ impl Converter<'_> {
             message.render(&self.handlebars, kind)
         }
     }
-    pub fn convert(&self, message: &gotify::models::Message) -> Result<RoomMessageEventContent> {
+    pub fn convert(&self, message: &GotifyMessage) -> Result<RoomMessageEventContent> {
         use config::GotifyPriority;
         let app = &self
             .apps
@@ -138,7 +138,7 @@ pub async fn run(config: config::Config) -> Result<()> {
     };
 
     let gotify_client: GotifyClient =
-        gotify::Client::new(config.gotify.url.as_str(), &config.gotify.token)?;
+        GotifyClient::new(&config.gotify.url, &config.gotify.token)?;
     sync(client, config, gotify_client, last_id)
         .await
         .map_err(Into::into)
@@ -155,13 +155,12 @@ async fn sync_gotify_messages(
     let mut current_id = last_id;
     loop {
         match sync_gotify_messages_loop(&client, &gotify_client, &config, &mut current_id).await {
-            Ok(_) => {}
-            Err(e) => {
-                warn!("Error {:?} in sync_gotify_messages_loop", e);
-                warn!("Retrying in 10s...");
-                tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
-            }
+            Ok(_) => debug!("Gotify stream ended; reconnecting in 10s..."),
+            Err(e) => warn!("Error {:?} in sync_gotify_messages_loop; retrying in 10s...", e),
         }
+        // Back off before re-running on both a clean close and an error, so a
+        // server that keeps closing the stream can't spin a tight reconnect loop.
+        tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
     }
 }
 
@@ -181,8 +180,7 @@ async fn sync_gotify_messages_loop(
     let converter = Converter::new(gotify_client, config).await?;
 
     // retrieve all old messages
-    let mut msg_builder = gotify_client.get_messages();
-    let mut paged_msgs = msg_builder.send().await?;
+    let mut paged_msgs = gotify_client.get_messages(None).await?;
     let mut msgs: Vec<_> = paged_msgs
         .messages
         .into_iter()
@@ -192,10 +190,9 @@ async fn sync_gotify_messages_loop(
     debug!("Got {} gotify messages", msgs.len());
 
     while paged_msgs.paging.next.is_some() && paged_msgs.paging.since >= last_id.unwrap_or(0) {
-        msg_builder = gotify_client
-            .get_messages()
-            .with_since(paged_msgs.paging.since);
-        paged_msgs = msg_builder.send().await?;
+        paged_msgs = gotify_client
+            .get_messages(Some(paged_msgs.paging.since))
+            .await?;
         let curr_msgs: Vec<_> = paged_msgs
             .messages
             .into_iter()

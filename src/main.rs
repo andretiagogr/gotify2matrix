@@ -3,6 +3,7 @@ use clap::Parser;
 
 mod client;
 pub mod config;
+mod gotify_client;
 pub mod session;
 mod verify;
 
@@ -24,6 +25,11 @@ struct Options {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
+
+    // Install the process-wide rustls crypto provider once, at startup, before any
+    // TLS consumer (reqwest, the gotify websocket) is constructed. The error case
+    // only signals a provider was already installed, which is harmless to ignore.
+    let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 
     let options = Options::parse();
 
