@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-matrix-sdk = { version = "0.17", features = ["e2e-encryption"] }
+matrix-sdk = { version = "0.17", features = ["e2e-encryption", "bundled-sqlite"] }
 anyhow = "1.0.102"
 url = { version = "2.5.8", features = ["serde"]}
 tokio = { version = "1.52.3", features = ["macros", "rt-multi-thread", "io-std"] }
@@ -17,6 +17,9 @@ dirs = "6.0.0"
 clap = { version = "4.6.1", features = ["derive"] }
 toml = "1.1.2"
 futures-util = "0.3.32"
-gotify = { version = "0.4.0", features = ["client-core", "manage-messages", "manage-applications", "websocket"] }
+gotify = { version = "0.4.0", default-features = false, features = ["rustls-tls", "client-core", "manage-messages", "manage-applications", "websocket"] }
 handlebars = "6.4.1"
 envy = "0.4.2"
+
+[profile.release]
+strip = true
