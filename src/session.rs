@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use matrix_sdk::{authentication::matrix::MatrixSession, config::SyncSettings, Client, Error, LoopCtrl};
-use rand::{distr::Alphanumeric, Rng, RngExt};
+use rand::{distr::Alphanumeric, RngExt};
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 use tracing::info;
